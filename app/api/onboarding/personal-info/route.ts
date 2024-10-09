@@ -3,18 +3,21 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { Database } from "@/app/lib/database.types";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
-  const supabase = createRouteHandlerClient<Database>({ cookies });
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session || !session.user.email) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
+  const cookieStore = cookies();
+  const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore });
 
   try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session || !session.user.email) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const { merchantName, email, phoneNumber, address } = await request.json();
 
     // Update the user's personal information
