@@ -25,9 +25,10 @@ export default function DriverProfilePage({
   const router = useRouter();
   const supabase = createClientComponentClient<Database>();
 
-  React.useEffect(() => {
-    async function fetchDriverAndCar() {
-      setLoading(true);
+  const fetchDriverAndCar = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const { data: driverData, error: driverError } = await supabase
         .from("drivers")
         .select(
@@ -36,11 +37,7 @@ export default function DriverProfilePage({
         .eq("id", params.id)
         .single<Driver>();
 
-      if (driverError) {
-        setError("Failed to fetch driver data");
-        setLoading(false);
-        return;
-      }
+      if (driverError) throw new Error("Failed to fetch driver data");
 
       setDriver(driverData);
 
@@ -53,37 +50,54 @@ export default function DriverProfilePage({
       if (!carError) {
         setCar(carData);
       }
-
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+    } finally {
       setLoading(false);
     }
-
-    fetchDriverAndCar();
   }, [params.id, supabase]);
 
-  if (loading)
+  React.useEffect(() => {
+    fetchDriverAndCar();
+  }, [fetchDriverAndCar]);
+
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen" aria-live="polite" aria-busy="true">
         <Loading />
       </div>
     );
-  if (error)
+  }
+
+  if (error) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        {error}
+      <div className="flex flex-col justify-center items-center h-screen text-red-500" role="alert">
+        <p>{error}</p>
+        <button 
+          onClick={fetchDriverAndCar}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md"
+        >
+          Retry
+        </button>
       </div>
     );
-  if (!driver)
+  }
+
+  if (!driver) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen" role="alert">
         No driver found
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-8 w-full lg:ml-[275px] lg:w-[calc(100%-275px)]">
       <button
         onClick={() => router.back()}
-        className="mb-6 px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md text-sm sm:text-base">
+        className="mb-6 px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md text-sm sm:text-base"
+        aria-label="Go back"
+      >
         &larr; Back
       </button>
 
@@ -94,8 +108,8 @@ export default function DriverProfilePage({
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
+            <section aria-labelledby="personal-info">
+              <h2 id="personal-info" className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
                 Personal Information
               </h2>
               <p className="mb-2 text-sm sm:text-base">
@@ -115,10 +129,10 @@ export default function DriverProfilePage({
                   ? new Date(driver.date_of_birth).toLocaleDateString()
                   : "N/A"}
               </p>
-            </div>
+            </section>
 
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
+            <section aria-labelledby="next-of-kin">
+              <h2 id="next-of-kin" className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
                 Next of Kin
               </h2>
               <p className="mb-2 text-sm sm:text-base">
@@ -133,12 +147,12 @@ export default function DriverProfilePage({
               <p className="mb-2 text-sm sm:text-base">
                 <span className="font-medium">Address:</span> {driver.next_of_kin_address}
               </p>
-            </div>
+            </section>
           </div>
 
           {car && (
-            <div className="mt-6 sm:mt-8">
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
+            <section aria-labelledby="car-info" className="mt-6 sm:mt-8">
+              <h2 id="car-info" className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
                 Car Information
               </h2>
               <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
@@ -155,19 +169,20 @@ export default function DriverProfilePage({
                   <div className="mt-3 sm:mt-4">
                     <Image
                       src={car.picture_url}
-                      alt="Car"
+                      alt={`${car.name} car`}
                       width={300}
                       height={200}
                       className="rounded-lg w-full max-w-[300px] h-auto"
+                      loading="lazy"
                     />
                   </div>
                 )}
               </div>
-            </div>
+            </section>
           )}
 
-          <div className="mt-6 sm:mt-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
+          <section aria-labelledby="location-info" className="mt-6 sm:mt-8">
+            <h2 id="location-info" className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">
               Location Information
             </h2>
             <p className="mb-2 text-sm sm:text-base">
@@ -176,7 +191,7 @@ export default function DriverProfilePage({
             <p className="mb-2 text-sm sm:text-base">
               <span className="font-medium">Longitude:</span> {driver.longitude}
             </p>
-          </div>
+          </section>
         </div>
       </div>
     </div>
