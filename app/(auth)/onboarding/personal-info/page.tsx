@@ -1,16 +1,32 @@
-// app/onboarding/personal-info/page.tsx
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { Database } from '@/app/lib/database.types';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PersonalInfoForm from './PersonalInfoForm';
 
-export default async function PersonalInfoOnboarding() {
-  const supabase = createServerComponentClient<Database>({ cookies });
-  const { data: { session } } = await supabase.auth.getSession();
+export default function PersonalInfoOnboarding() {
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  if (!session) {
-    redirect('/signin');
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/check-session');
+        if (!response.ok) {
+          throw new Error('Session check failed');
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Session check error:', error);
+        router.push('/signin');
+      }
+    };
+
+    checkSession();
+  }, [router]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   return <PersonalInfoForm />;
