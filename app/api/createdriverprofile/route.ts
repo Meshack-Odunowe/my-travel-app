@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     // Handle car picture upload
     const carPicture = formData.get('carPicture') as File;
     if (carPicture) {
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('car-pictures')
         .upload(`${car.id}.jpg`, carPicture, {
           contentType: 'image/jpeg',
