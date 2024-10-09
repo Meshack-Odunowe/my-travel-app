@@ -10,8 +10,7 @@ import Loading from "./Loading";
 function TopNav() {
   const [user, setUser] = useState<{
     email?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
+    name?: string | null;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -21,23 +20,28 @@ function TopNav() {
     const fetchUser = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       
-
       if (authUser) {
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from('users')
-          .select('firstName, lastName')
+          .select('name')
           .eq('id', authUser.id)
           .single();
         
-       
+        if (error) {
+          console.error("Error fetching user profile:", error);
+        }
 
         if (profile) {
           setUser({
             email: authUser.email,
-            ...profile
+            name: profile.name
           });
         } else {
           console.log("No profile found for user");
+          setUser({
+            email: authUser.email,
+            name: authUser.user_metadata?.name || null
+          });
         }
       } else {
         console.log("No authenticated user found");
@@ -48,25 +52,48 @@ function TopNav() {
     fetchUser();
   }, [supabase]);
 
-
   if (loading) {
     return <div><Loading/></div>;
   }
 
   const getInitials = () => {
-    if (user?.firstName && user?.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-    } else if (user?.firstName) {
-      return user.firstName[0].toUpperCase();
+    if (user?.name) {
+      const nameParts = user.name.split(' ');
+      if (nameParts.length > 1) {
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+      } else {
+        return user.name[0].toUpperCase();
+      }
     } else if (user?.email) {
       return user.email[0].toUpperCase();
     }
     return 'U';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const getFirstName = () => {
+    if (user?.name) {
+      return user.name.split(' ')[0];
+    }
+    return 'User';
+  };
+
   return (
-    <div className="w-[calc(100%-275px)] flex justify-between items-center mx-auto">
-      <Search />
+    <div className="lg:w-[calc(100%-275px)] flex justify-between items-center mx-auto mt-8">
+      <div className="flex items-center">
+        <div className="mr-2">
+          <h2 className="text-lg font-semibold text-gray-800">
+            {getGreeting()}, {getFirstName()}
+          </h2>
+        </div>
+        <Search />
+      </div>
       <div className="flex items-center justify-center gap-8">
         <Image
           width={20}

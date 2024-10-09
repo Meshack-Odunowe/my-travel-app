@@ -22,8 +22,8 @@ export default function SignUp() {
     try {
       const response = await fetch('/api/auth/sign-up', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           email,
           password,
           firstName,
@@ -48,6 +48,9 @@ export default function SignUp() {
       setIsLoading(false);
     }
   };
+
+
+
 
   return (
     <main className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
