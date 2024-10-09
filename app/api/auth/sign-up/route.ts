@@ -36,17 +36,19 @@ export async function POST(request: Request) {
       const { error: insertError } = await supabase
         .from('users')
         .insert({
-          id: data.user.id ?? '',
-          email: data.user.email,
-          firstName,
-          lastName,
-          name: `${firstName} ${lastName}`,
+          id: data.user.id,
+          email: data.user.email!,
+          firstName: firstName || '',
+          lastName: lastName || '',
+          name: `${firstName || ''} ${lastName || ''}`.trim(),
         });
 
       if (insertError) {
         console.error('Error inserting user data:', insertError);
         return NextResponse.json({ error: 'Error creating user profile' }, { status: 500 });
       }
+    } else {
+      return NextResponse.json({ error: 'No user data returned from sign-up' }, { status: 500 });
     }
 
     return NextResponse.json({ message: 'Sign up successful' }, { status: 200 });
