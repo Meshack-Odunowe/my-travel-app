@@ -46,8 +46,7 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error('Error updating user profile:', updateError);
-      // Consider how you want to handle this error. You might want to log it,
-      // but still allow the sign-up to be considered successful.
+     
     }
   }
 

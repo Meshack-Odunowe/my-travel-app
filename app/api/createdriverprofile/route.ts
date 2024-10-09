@@ -16,7 +16,19 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     
     // Extract driver details
+    // Get the admin user
+    const { data: admin, error: adminError } = await supabase
+      .from('users')
+      .select('id, role, company_id')
+      .eq('id', session.user.id)
+      .single();
+
+    if (adminError || !admin || admin.role !== 'COMPANY_ADMIN' || !admin.company_id) {
+      return NextResponse.json({ error: 'Unauthorized or invalid admin user' }, { status: 403 });
+    }
+
     const driverData = {
+      id: crypto.randomUUID(),
       name: formData.get('name') as string,
       phone_number: formData.get('phoneNumber') as string,
       address: formData.get('address') as string,
@@ -27,6 +39,12 @@ export async function POST(req: NextRequest) {
       next_of_kin_relationship: formData.get('nextOfKinRelationship') as string,
       next_of_kin_address: formData.get('nextOfKinAddress') as string,
       next_of_kin_work_address: formData.get('nextOfKinWorkAddress') as string,
+      license_number: formData.get('licenseNumber') as string,
+      created_at: new Date().toISOString(),
+      latitude: formData.get('latitude') as string,
+      longitude: formData.get('longitude') as string,
+      company_id: admin.company_id,
+      created_by: admin.id,
     };
 
     // Extract car details
@@ -36,13 +54,6 @@ export async function POST(req: NextRequest) {
       engine_number: formData.get('engineNumber') as string,
       plate_number: formData.get('plateNumber') as string,
     };
-
-    // Get the admin user
-    const { data: admin, error: adminError } = await supabase
-      .from('users')
-      .select('id, role, company_id')
-      .eq('id', session.user.id)
-      .single();
 
     if (adminError || !admin || admin.role !== 'COMPANY_ADMIN' || !admin.company_id) {
       return NextResponse.json({ error: 'Unauthorized or invalid admin user' }, { status: 403 });
@@ -110,7 +121,7 @@ export async function POST(req: NextRequest) {
 
         await supabase
           .from('cars')
-          .update({ picture_url: publicUrlData.publicUrl })
+          .update({ picture_url: publicUrlData.publicUrl, engine_number: carData.engine_number })
           .eq('id', car.id);
       }
     }

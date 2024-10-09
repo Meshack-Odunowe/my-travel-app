@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import type { Database } from '@/lib/database.types';  // Adjust this import path as needed
+import { Database } from '@/app/lib/database.types';
+
 
 export async function GET(
   request: NextRequest,

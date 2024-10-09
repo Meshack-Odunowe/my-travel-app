@@ -5,7 +5,7 @@ import { GoogleAuth } from 'google-auth-library';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request) {
+export async function GET() {
   const supabase = createRouteHandlerClient({ cookies });
 
   // Check if user is authenticated with Supabase
@@ -22,8 +22,8 @@ export async function GET(req: Request) {
     });
 
     const client = await auth.getClient();
-    const projectId = await auth.getProjectId();
-    const url = `https://fleetengine.googleapis.com/v1/projects/${projectId}/providers/consumer`;
+    // const projectId = await auth.getProjectId();
+    // const url = `https://fleetengine.googleapis.com/v1/projects/${projectId}/providers/consumer`;
     const { token } = await client.getAccessToken();
 
     return NextResponse.json({ token });

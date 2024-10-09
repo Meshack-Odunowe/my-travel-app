@@ -5,6 +5,7 @@ import "../globals.css";
 
 
 import Sidebar from "../components/Sidebar";
+import MobileSidebar from "../components/MobileSidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-[#DFE0EB] `}>
-        <Sidebar/>
+        <Sidebar />
+        <MobileSidebar />
+        
         {children}
       </body>
     </html>

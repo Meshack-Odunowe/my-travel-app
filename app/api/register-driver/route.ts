@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     // Update the driver's location in your database
     const { error } = await supabase
       .from('drivers')
-      .update({ 
+      .update({
         name: name,
         last_known_latitude: latitude,
         last_known_longitude: longitude,
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       }
     );
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Driver registered successfully',
       fleetRoutingData: fleetRoutingResponse.data
     });
@@ -52,8 +52,5 @@ export async function POST(req: Request) {
       console.error('Error registering driver:', (error as Error).message);
       return NextResponse.json({ error: 'Failed to register driver' }, { status: 500 });
     }
-  }
-    console.error('Error registering driver:', Error.response?.data || Error.message);
-    return NextResponse.json({ error: 'Failed to register driver' }, { status: 500 });
   }
 }

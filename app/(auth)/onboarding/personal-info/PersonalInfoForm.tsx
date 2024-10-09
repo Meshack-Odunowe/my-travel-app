@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 
 export default function PersonalInfoForm() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [merchantName, setMerchantName] = useState('');
+  const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
@@ -25,8 +25,8 @@ export default function PersonalInfoForm() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          firstName,
-          lastName,
+          merchantName,
+          email,
           phoneNumber,
           address,
         }),
@@ -47,85 +47,89 @@ export default function PersonalInfoForm() {
   };
 
   return (
-    <div className="bg-white min-h-screen flex items-center justify-center">
-      <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        <div className="max-w-xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">Personal Information</h1>
-          <Image width={450} height={450} alt="logo" src="/logo.svg" className="mb-6" />
-          <p className="text-xl md:text-2xl font-light mb-8">
-            Let&apos;s get to know you better <br /> to provide you with the best experience
-          </p>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          <form onSubmit={handleSubmit} className="font-light flex flex-col gap-6 mb-8">
-            <div className="flex flex-col">
-              <label htmlFor="firstName" className="text-xl mb-2">
-                First Name
-              </label>
-              <input
-                id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                aria-label="Enter your first name"
-                type="text"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="lastName" className="text-xl mb-2">
-                Last Name
-              </label>
-              <input
-                id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                aria-label="Enter your last name"
-                type="text"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="phoneNumber" className="text-xl mb-2">
-                Phone Number
-              </label>
-              <input
-                id="phoneNumber"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                aria-label="Enter your phone number"
-                type="tel"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="address" className="text-xl mb-2">
-                Address
-              </label>
-              <input
-                id="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                aria-label="Enter your address"
-                type="text"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
-            </div>
-            <button 
-              type="submit" 
-              className="bg-blue-500 text-white rounded-full py-3 px-6"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Saving...' : 'Next'}
-            </button>
-          </form>
-        </div>
-        <div className="hidden lg:block">
-          <Image width={600} height={700} alt="onboarding" src="/bus.avif" className="mx-auto" />
+    <main className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+      <div className="container max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <section className="p-8 lg:p-12">
+            <Image width={120} height={40} alt="logo" src="/logo.svg" className="mb-8" />
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-gray-800">Personal Information</h1>
+            <p className="text-xl font-light mb-8 text-gray-600">
+              Let&apos;s get to know you better to provide you with the best experience
+            </p>
+            {error && <p className="text-red-500 mb-4 p-3 bg-red-100 rounded">{error}</p>}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="merchantName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Merchant Name
+                </label>
+                <input
+                  id="merchantName"
+                  value={merchantName}
+                  onChange={(e) => setMerchantName(e.target.value)}
+                  type="text"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  id="phoneNumber"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  type="tel"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
+                <input
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  type="text"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <button 
+                type="submit" 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-3 px-6 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Saving...' : 'Next'}
+              </button>
+            </form>
+          </section>
+          <section className="hidden lg:block relative">
+            <Image 
+              src="/bus.avif" 
+              alt="onboarding" 
+              layout="fill"
+              objectFit="cover"
+              className="rounded-l-2xl"
+            />
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

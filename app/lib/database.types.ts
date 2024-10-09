@@ -15,6 +15,7 @@ export interface Database {
           lastName: string;
           id: string;
           email: string;
+          merchantname: string | null
           company_id: string | null;
           role: string;
           name: string | null;
@@ -73,6 +74,7 @@ export interface Database {
           next_of_kin_work_address: string
           latitude: string
           longitude: string
+          last_updated?: string; // Added field
         };
         Insert: {
           id: string;
@@ -92,6 +94,7 @@ export interface Database {
           next_of_kin_work_address: string
           latitude: string
           longitude: string
+          last_updated?: string; // Added field
         };
         Update: {
           id: string;
@@ -110,6 +113,7 @@ export interface Database {
           next_of_kin_work_address: string
           latitude: string
           longitude: string
+          last_updated?: string; // Added field
         };
       };
       cars: {

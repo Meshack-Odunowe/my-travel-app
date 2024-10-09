@@ -21,7 +21,7 @@ export default function BusinessInfoOnboarding(): JSX.Element {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push('/login'); // Redirect to login if no session
+        router.push('/login');
       } else {
         setIsLoading(false);
       }
@@ -65,85 +65,93 @@ export default function BusinessInfoOnboarding(): JSX.Element {
   }
 
   return (
-    <div className="bg-white min-h-screen flex items-center justify-center">
-      <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        <div className="max-w-xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">Business Information</h1>
-          <Image width={450} height={450} alt="logo" src="/logo.svg" className="mb-6" />
-          <p className="text-xl md:text-2xl font-light mb-8">
-            Let&apos;s get your business set up <br /> to start tracking your vehicles
-          </p>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          <form onSubmit={handleSubmit} className="font-light flex flex-col gap-6 mb-8">
-            <div className="flex flex-col">
-              <label htmlFor="businessName" className="text-xl mb-2">
-                Business Name
-              </label>
-              <input
-                id="businessName"
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                aria-label="Enter your business name"
-                type="text"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="flex flex-col lg:flex-row">
+          <section className="w-full lg:w-1/2 p-6 sm:p-8 lg:p-12">
+            <div className="mb-8">
+              <Image width={120} height={40} alt="logo" src="/logo.svg" className="mb-6" />
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-gray-800">Business Information</h1>
+              <p className="text-lg sm:text-xl font-light mb-6 text-gray-600">
+                Let&apos;s get your business set up to start tracking your vehicles
+              </p>
             </div>
-            <div className="flex flex-col">
-              <label htmlFor="businessPhoneNumber" className="text-xl mb-2">
-                Business Phone Number
-              </label>
-              <input
-                id="businessPhoneNumber"
-                value={businessPhoneNumber}
-                onChange={(e) => setBusinessPhoneNumber(e.target.value)}
-                aria-label="Enter your business phone number"
-                type="tel"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="businessAddress" className="text-xl mb-2">
-                Business Address
-              </label>
-              <input
-                id="businessAddress"
-                value={businessAddress}
-                onChange={(e) => setBusinessAddress(e.target.value)}
-                aria-label="Enter your business address"
-                type="text"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="businessRegistrationNumber" className="text-xl mb-2">
-                Business Registration Number
-              </label>
-              <input
-                id="businessRegistrationNumber"
-                value={businessRegistrationNumber}
-                onChange={(e) => setBusinessRegistrationNumber(e.target.value)}
-                aria-label="Enter your business registration number"
-                type="text"
-                className="h-16 rounded-2xl border-gray-200 border px-4"
-                required
-              />
-            </div>
-            <button 
-              type="submit" 
-              className="bg-blue-500 text-white rounded-full py-3 px-6"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Completing...' : 'Complete Onboarding'}
-            </button>
-          </form>
-        </div>
-        <div className="hidden lg:block">
-          <Image width={600} height={700} alt="business" src="/buses.avif" className="mx-auto" />
+            
+            {error && <p className="text-red-500 mb-4 p-3 bg-red-100 rounded">{error}</p>}
+            
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <div>
+                <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Name
+                </label>
+                <input
+                  id="businessName"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  type="text"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="businessPhoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Phone Number
+                </label>
+                <input
+                  id="businessPhoneNumber"
+                  value={businessPhoneNumber}
+                  onChange={(e) => setBusinessPhoneNumber(e.target.value)}
+                  type="tel"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="businessAddress" className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Address
+                </label>
+                <input
+                  id="businessAddress"
+                  value={businessAddress}
+                  onChange={(e) => setBusinessAddress(e.target.value)}
+                  type="text"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="businessRegistrationNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Registration Number
+                </label>
+                <input
+                  id="businessRegistrationNumber"
+                  value={businessRegistrationNumber}
+                  onChange={(e) => setBusinessRegistrationNumber(e.target.value)}
+                  type="text"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <button 
+                type="submit" 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-3 px-6 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Completing...' : 'Complete Onboarding'}
+              </button>
+            </form>
+          </section>
+          <section className="hidden lg:block w-1/2 relative">
+            <Image 
+              src="/buses.avif" 
+              alt="business"
+              layout="fill"
+              objectFit="cover"
+              className="rounded-l-2xl"
+            />
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

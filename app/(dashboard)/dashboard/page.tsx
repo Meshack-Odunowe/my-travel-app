@@ -3,8 +3,9 @@ import Dashboard from '../../components/Dashboard'
 
 const UserDashboard = () => {
   return (
-    <div className='lg:ml-[275px] w-[calc(100%-275px)]'>      <Dashboard />
-</div>
+    <div className="w-full px-4 sm:px-6 md:px-8 lg:ml-[275px] lg:w-[calc(100%-275px)]">
+      <Dashboard />
+    </div>
   )
 }
 

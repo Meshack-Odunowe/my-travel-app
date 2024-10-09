@@ -1,17 +1,19 @@
-import React from "react";
-import TopNav from "./TopNav";
-import TravellingIndicator from "./TravellingIndicator";
-import FleetEngineMap from "./FleetEngineMap";
 
-const Dashboard = () => {
+import React from "react"
+import TopNav from "./TopNav"
+import TravellingIndicator from "./TravellingIndicator"
+import FleetEngineMap from "./FleetEngineMap"
+
+
+const Dashboard: React.FC = () => {
   return (
-    <div className=" p-4">
-      {" "}
+    <div className="p-4">
       <TopNav />
+      
       <TravellingIndicator />
       <FleetEngineMap />
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

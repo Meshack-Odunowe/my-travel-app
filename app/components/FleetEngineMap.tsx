@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Loading from './Loading';
 
 interface Driver {
@@ -10,33 +11,31 @@ interface Driver {
   latitude: number;
   longitude: number;
   email: string;
-  phoneNumber: string;
+  phone_number: string;
 }
 
 const FleetEngineMap: React.FC = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
+  const [error, setError] = useState<string | null>(null);
+  
+  const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+    libraries: ['places'],
   });
 
-  useEffect(() => {
-    // Fetch drivers
-    fetch('/api/drivers')
-      .then((res) => res.json())
-      .then((data) => setDrivers(data));
-  }, []);
+  const supabase = createClientComponentClient();
 
   const mapContainerStyle = {
     width: '100%',
     height: '600px'
   };
 
+  // Lagos coordinates
   const center = useMemo(() => ({
-    lat: drivers.reduce((sum, driver) => sum + driver.latitude, 0) / drivers.length || 0,
-    lng: drivers.reduce((sum, driver) => sum + driver.longitude, 0) / drivers.length || 0,
-  }), [drivers]);
+    lat: 6.5244,
+    lng: 3.3792,
+  }), []);
 
   const carIcon = useMemo(() => {
     if (!isLoaded) return null;
@@ -48,7 +47,60 @@ const FleetEngineMap: React.FC = () => {
     };
   }, [isLoaded]);
 
-  if (!isLoaded) return <div><Loading/></div>;
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('drivers')
+          .select('id, name, email, phone_number, latitude, longitude');
+
+        if (error) throw error;
+
+        setDrivers(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      }
+    };
+
+    fetchDrivers();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('drivers_location_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'drivers',
+        },
+        (payload) => {
+          setDrivers((currentDrivers) =>
+            currentDrivers.map((driver) =>
+              driver.id === payload.new.id ? { ...driver, ...payload.new } : driver
+            )
+          );
+        }
+      )
+      .subscribe();
+
+    // Cleanup function
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
+
+  if (loadError) {
+    return <div>Error loading maps</div>;
+  }
+
+  if (!isLoaded) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <GoogleMap
@@ -56,15 +108,14 @@ const FleetEngineMap: React.FC = () => {
       center={center}
       zoom={12}
     >
-      {isLoaded && carIcon && drivers.map((driver) => (
+      {drivers.map((driver) => (
         <Marker
           key={driver.id}
           position={{ lat: driver.latitude, lng: driver.longitude }}
-          icon={carIcon}
+          icon={carIcon || undefined}
           onClick={() => setSelectedDriver(driver)}
         />
       ))}
-
       {selectedDriver && (
         <InfoWindow
           position={{ lat: selectedDriver.latitude, lng: selectedDriver.longitude }}
@@ -73,7 +124,7 @@ const FleetEngineMap: React.FC = () => {
           <div>
             <h2 className="text-lg font-bold">{selectedDriver.name}</h2>
             <p><strong>Email:</strong> {selectedDriver.email}</p>
-            <p><strong>Phone:</strong> {selectedDriver.phoneNumber}</p>
+            <p><strong>Phone:</strong> {selectedDriver.phone_number}</p>
           </div>
         </InfoWindow>
       )}
