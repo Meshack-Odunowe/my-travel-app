@@ -126,7 +126,7 @@ export interface Database {
           company_id: string;
           driver_id: string;
           engine_number: string;
-          picture_url?: string;
+          picture_url?: string | null;
         };
         Insert: {
           id?: string;

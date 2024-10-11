@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       color: formData.get('carColor') as string,
       engine_number: formData.get('engineNumber') as string,
       plate_number: formData.get('plateNumber') as string,
-      year: parseInt(formData.get('carYear') as string, 10),
+      year: parseInt(formData.get('carYear') as string, 10) || null,
     };
 
     // Check if driver with this email already exists
@@ -84,14 +84,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Handle car picture upload
-    const carPicture = formData.get('carPicture') as File;
-    let pictureUrl = null;
+    const carPicture = formData.get('carPicture') as File | null;
+    let pictureUrl: string | undefined = undefined;
 
     if (carPicture && admin.role === 'COMPANY_ADMIN') {
       const fileExt = carPicture.name.split('.').pop();
       const fileName = `${driver.id}_${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from(BUCKET_NAME)
         .upload(fileName, carPicture, {
           cacheControl: '3600',
@@ -104,13 +104,15 @@ export async function POST(req: NextRequest) {
           console.error('RLS policy violation. Please check your storage bucket policies.');
         }
         // Continue without image URL
-      } else {
+      } else if (uploadData) {
         // Get the public URL of the uploaded image
         const { data: publicUrlData } = supabase.storage
           .from(BUCKET_NAME)
           .getPublicUrl(fileName);
 
-        pictureUrl = publicUrlData.publicUrl;
+        if (publicUrlData) {
+          pictureUrl = publicUrlData.publicUrl;
+        }
       }
     }
 
