@@ -18,6 +18,8 @@ interface FormData {
   nextOfKinWorkAddress: string;
   carName: string;
   carColor: string;
+  carModel: string;
+  carYear: string;
   engineNumber: string;
   plateNumber: string;
   carPicture: File | null;
@@ -37,6 +39,8 @@ export default function CreateDriverProfile() {
     nextOfKinWorkAddress: "",
     carName: "",
     carColor: "",
+    carModel: "",
+    carYear:"",
     engineNumber: "",
     plateNumber: "",
     carPicture: null,
@@ -71,7 +75,11 @@ export default function CreateDriverProfile() {
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== null) {
-          formDataToSend.append(key, value);
+          if (key === 'carPicture' && value instanceof File) {
+            formDataToSend.append(key, value, value.name);
+          } else {
+            formDataToSend.append(key, value.toString());
+          }
         }
       });
   
@@ -103,11 +111,13 @@ export default function CreateDriverProfile() {
         nextOfKinWorkAddress: "",
         carName: "",
         carColor: "",
+        carModel: "",
+        carYear:"",
         engineNumber: "",
         plateNumber: "",
         carPicture: null,
       });
-      setTimeout(() => router.push(`/drivers/${data.id}`), 2000);
+      setTimeout(() => router.push(`/drivers`), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
@@ -116,7 +126,7 @@ export default function CreateDriverProfile() {
   };
 
   return (
-    <div className="max-w-7xl  lg:ml-[275px] w-[calc(100%-275px)] mx-auto p-4 lg:p-8">
+    <div className="max-w-7xl lg:ml-[275px] w-[calc(100%-275px)] mx-auto p-4 lg:p-8">
       <div className="flex flex-col lg:flex-row lg:space-x-8">
         <div className="lg:w-1/2 mb-8 lg:mb-0">
           <h1 className="text-3xl font-bold mb-6">Create Driver Profile</h1>
@@ -283,12 +293,12 @@ export default function CreateDriverProfile() {
                 />
               </div>
               <div>
-                <label htmlFor="carColor" className="block mb-1 font-medium">Car Color</label>
+                <label htmlFor="carModel" className="block mb-1 font-medium">Car Model</label>
                 <input
                   type="text"
-                  id="carColor"
-                  name="carColor"
-                  value={formData.carColor}
+                  id="carModel"
+                  name="carModel"
+                  value={formData.carModel}
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500"
@@ -297,12 +307,12 @@ export default function CreateDriverProfile() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="engineNumber" className="block mb-1 font-medium">Engine Number</label>
+                <label htmlFor="carColor" className="block mb-1 font-medium">Car Color</label>
                 <input
                   type="text"
-                  id="engineNumber"
-                  name="engineNumber"
-                  value={formData.engineNumber}
+                  id="carColor"
+                  name="carColor"
+                  value={formData.carColor}
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500"
@@ -321,6 +331,30 @@ export default function CreateDriverProfile() {
                 />
               </div>
             </div>
+            <div>
+              <label htmlFor="engineNumber" className="block mb-1 font-medium">Engine Number</label>
+              <input
+                type="text"
+                id="engineNumber"
+                name="engineNumber"
+                value={formData.engineNumber}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+  <label htmlFor="carYear" className="block mb-1 font-medium">Car Year</label>
+  <input
+    type="number"
+    id="carYear"
+    name="carYear"
+    value={formData.carYear}
+    onChange={handleChange}
+    required
+    className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500"
+  />
+</div>
             <div>
               <label htmlFor="carPicture" className="block mb-1 font-medium">Car Picture</label>
               <input

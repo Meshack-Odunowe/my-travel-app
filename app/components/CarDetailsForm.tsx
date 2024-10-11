@@ -36,34 +36,19 @@ export default function CarDetailsForm({ driverId }: CarDetailsFormProps) {
     setError(null);
 
     try {
-      let carPictureUrl = '';
+      const formDataToSend = new FormData();
+      formDataToSend.append('driverId', driverId);
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('color', formData.color);
+      formDataToSend.append('engineNumber', formData.engineNumber);
+      formDataToSend.append('plateNumber', formData.plateNumber);
       if (formData.carPicture) {
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', formData.carPicture as File);
-        const uploadResponse = await fetch('/api/upload-image', {
-          method: 'POST',
-          body: uploadFormData,
-        });
-        if (!uploadResponse.ok) {
-          throw new Error('Failed to upload image');
-        }
-        const { url } = await uploadResponse.json();
-        carPictureUrl = url;
+        formDataToSend.append('carPicture', formData.carPicture);
       }
 
       const response = await fetch('/api/car-details', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          driverId,
-          name: formData.name,
-          color: formData.color,
-          engineNumber: formData.engineNumber,
-          plateNumber: formData.plateNumber,
-          carPictureUrl,
-        }),
+        body: formDataToSend,
       });
 
       if (!response.ok) {

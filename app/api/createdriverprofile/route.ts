@@ -1,7 +1,10 @@
+// api/createdriverprofile/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { Database } from '@/app/lib/database.types';
+
+const BUCKET_NAME = 'car-images';
 
 export async function POST(req: NextRequest) {
   const supabase = createRouteHandlerClient<Database>({ cookies });
@@ -15,7 +18,6 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     
-    // Extract driver details
     // Get the admin user
     const { data: admin, error: adminError } = await supabase
       .from('users')
@@ -27,6 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized or invalid admin user' }, { status: 403 });
     }
 
+    // Extract driver details
     const driverData = {
       id: crypto.randomUUID(),
       name: formData.get('name') as string,
@@ -39,25 +42,23 @@ export async function POST(req: NextRequest) {
       next_of_kin_relationship: formData.get('nextOfKinRelationship') as string,
       next_of_kin_address: formData.get('nextOfKinAddress') as string,
       next_of_kin_work_address: formData.get('nextOfKinWorkAddress') as string,
-      license_number: formData.get('licenseNumber') as string,
       created_at: new Date().toISOString(),
-      latitude: formData.get('latitude') as string,
-      longitude: formData.get('longitude') as string,
       company_id: admin.company_id,
       created_by: admin.id,
+      license_number: formData.get('licenseNumber') as string,
+      latitude: formData.get('latitude') as string,
+      longitude: formData.get('longitude') as string,
     };
 
     // Extract car details
     const carData = {
       name: formData.get('carName') as string,
-      // Remove color field as it doesn't exist in the database
+      model: formData.get('carModel') as string,
+      color: formData.get('carColor') as string,
       engine_number: formData.get('engineNumber') as string,
       plate_number: formData.get('plateNumber') as string,
+      year: parseInt(formData.get('carYear') as string, 10),
     };
-
-    if (adminError || !admin || admin.role !== 'COMPANY_ADMIN' || !admin.company_id) {
-      return NextResponse.json({ error: 'Unauthorized or invalid admin user' }, { status: 403 });
-    }
 
     // Check if driver with this email already exists
     const { data: existingDriver } = await supabase
@@ -73,11 +74,7 @@ export async function POST(req: NextRequest) {
     // Create the driver
     const { data: driver, error: driverError } = await supabase
       .from('drivers')
-      .insert({
-        ...driverData,
-        company_id: admin.company_id,
-        created_by: admin.id,
-      })
+      .insert(driverData)
       .select()
       .single();
 
@@ -86,13 +83,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create driver' }, { status: 500 });
     }
 
-    // Create the car
+    // Handle car picture upload
+    const carPicture = formData.get('carPicture') as File;
+    let pictureUrl = null;
+
+    if (carPicture && admin.role === 'COMPANY_ADMIN') {
+      const fileExt = carPicture.name.split('.').pop();
+      const fileName = `${driver.id}_${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(fileName, carPicture, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Error uploading car picture:', uploadError);
+        if (uploadError.message.includes('row-level security policy')) {
+          console.error('RLS policy violation. Please check your storage bucket policies.');
+        }
+        // Continue without image URL
+      } else {
+        // Get the public URL of the uploaded image
+        const { data: publicUrlData } = supabase.storage
+          .from(BUCKET_NAME)
+          .getPublicUrl(fileName);
+
+        pictureUrl = publicUrlData.publicUrl;
+      }
+    }
+
+    // Create the car with picture URL
     const { data: car, error: carError } = await supabase
       .from('cars')
       .insert({
         ...carData,
         company_id: admin.company_id,
         driver_id: driver.id,
+        picture_url: pictureUrl,
       })
       .select()
       .single();
@@ -102,31 +131,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create car' }, { status: 500 });
     }
 
-    // Handle car picture upload
-    const carPicture = formData.get('carPicture') as File;
-    if (carPicture) {
-      const { error: uploadError } = await supabase.storage
-        .from('car-pictures')
-        .upload(`${car.id}.jpg`, carPicture, {
-          contentType: 'image/jpeg',
-        });
-
-      if (uploadError) {
-        console.error('Error uploading car picture:', uploadError);
-      } else {
-        // Update car record with picture URL
-        const { data: publicUrlData } = supabase.storage
-          .from('car-pictures')
-          .getPublicUrl(`${car.id}.jpg`);
-
-        await supabase
-          .from('cars')
-          .update({ picture_url: publicUrlData.publicUrl, engine_number: carData.engine_number })
-          .eq('id', car.id);
-      }
-    }
-
-    return NextResponse.json({ id: driver.id }, { status: 201 });
+    return NextResponse.json({ driver, car }, { status: 201 });
   } catch (error) {
     console.error('Error in driver profile creation:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
