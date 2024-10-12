@@ -63,11 +63,11 @@ export default function DriverProfiles() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:py-12 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className=" w-fit ">
       <h1 className="text-3xl sm:text-4xl font-extrabold mb-8 sm:mb-10 text-center text-gray-800">
         Driver Profiles
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6 sm:gap-8">
         {drivers.map((driver) => (
           <div 
             key={driver.id} 

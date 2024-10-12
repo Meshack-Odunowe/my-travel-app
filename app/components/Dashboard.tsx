@@ -7,7 +7,7 @@ import FleetEngineMap from "./FleetEngineMap"
 
 const Dashboard: React.FC = () => {
   return (
-    <div className="p-4">
+    <div className="p-2">
       <TopNav />
       
       <TravellingIndicator />
