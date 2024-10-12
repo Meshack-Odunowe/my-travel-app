@@ -20,8 +20,7 @@ export interface Car {
 
   engine_number: string;
 
-  picture_url?: string;
-
+  picture_url: string | null | undefined;
 }
 
 
