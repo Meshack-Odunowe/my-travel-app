@@ -136,7 +136,9 @@ export interface Database {
           company_id: string;
           driver_id: string;
           engine_number: string;
-          picture_url: string | null | undefined;        };
+          color?: string | null;
+          picture_url?: string;
+        };
         Update: {
           id?: string;
           name?: string;
@@ -146,7 +148,9 @@ export interface Database {
           company_id?: string;
           driver_id?: string;
           engine_number: string;
-          picture_url: string | null | undefined;        };
+          color?: string | null;
+          picture_url?: string;
+        };
       };
 
       companies: {
