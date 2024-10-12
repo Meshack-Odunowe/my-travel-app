@@ -70,38 +70,24 @@ function TopNav() {
     return 'U';
   };
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
-
-  const getFirstName = () => {
-    if (user?.name) {
-      return user.name.split(' ')[0];
-    }
-    return 'User';
-  };
+  
 
   return (
-    <div className="lg:w-[calc(100%-275px)] flex justify-between items-center mx-auto mt-8">
-      <div className="flex items-center">
-        <div className="mr-2">
-          <h2 className="text-lg font-semibold text-gray-800">
-            {getGreeting()}, {getFirstName()}
-          </h2>
+    <div className="w-full lg:w-[calc(100%-275px)] flex flex-row sm:flex-row justify-between items-center mx-auto mt-4 sm:mt-8 px-4 sm:px-0">
+      <div className="flex flex-row items-center w-full sm:w-auto mb-4 sm:mb-0">
+        
+        <div className="w-full sm:w-auto">
+          <Search />
         </div>
-        <Search />
       </div>
-      <div className="flex items-center justify-center gap-8">
+      <div className="flex items-center justify-center gap-4 sm:gap-8">
         <Image
           width={20}
           height={20}
           src="/notification_outline.svg"
           alt="Notification icon"
         />
-        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-lg">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm sm:text-lg">
           {getInitials()}
         </div>
       </div>

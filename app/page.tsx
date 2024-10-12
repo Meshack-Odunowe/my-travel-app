@@ -17,10 +17,8 @@ export default function HomePage() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        // User is signed in, redirect to dashboard
         router.push('/dashboard');
       } else {
-        // User is not signed in, we'll show the sign-in page
         setLoading(false);
       }
     };
@@ -29,9 +27,8 @@ export default function HomePage() {
   }, [supabase, router]);
 
   if (loading) {
-    return <Loading/>; // Or any loading component you prefer
+    return <Loading/>; 
   }
 
-  // If we're here, the user is not signed in, so we show the sign-in page
   return <SignIn />;
 }
