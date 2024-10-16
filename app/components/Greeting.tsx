@@ -74,7 +74,7 @@ export function Greeting() {
   };
   return (
     <div>
-      <h2 className="text-lg mt-8 font-semibold text-gray-800 text-center sm:text-left">
+      <h2 className="text-lg pt-8 font-semibold text-gray-800 text-center sm:text-left">
         {getGreeting()}, {getFirstName()}
       </h2>
     </div>

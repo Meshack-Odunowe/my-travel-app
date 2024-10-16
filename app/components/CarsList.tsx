@@ -1,8 +1,8 @@
-// app/cars/CarsList.tsx
-'use client';
-
-import { useEffect, useState } from 'react';
+'use client'
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Loading from './Loading';
+import Link from 'next/link';
 
 interface Car {
   id: string;
@@ -15,7 +15,7 @@ interface Car {
   drivers: { name: string };
 }
 
-export default function CarsList() {
+const CarsList: React.FC = () => {
   const [cars, setCars] = useState<Car[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,8 +40,17 @@ export default function CarsList() {
     fetchCars();
   }, []);
 
-  if (isLoading) return <div>Loading cars...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  if (isLoading) return <div className="text-center py-8"><Loading/></div>;
+  if (error) return <div className="text-red-500 text-center py-8">{error}</div>;
+  if (cars.length === 0) return <div className="text-center flex items-center justify-center h-screen flex-col gap-5 py-8 text-xl">No car records found. Create a driver profile and assign a car to the driver here . <br /><Link 
+  href="/drivers/create" 
+  className="bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full hover:bg-blue-700 transition-colors duration-300 inline-flex items-center shadow-lg text-sm sm:text-base"
+>
+  <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+  </svg>
+  Create New Driver Profile
+</Link> </div>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -72,4 +81,6 @@ export default function CarsList() {
       ))}
     </div>
   );
-}
+};
+
+export default CarsList;
